@@ -21,6 +21,10 @@ u2g = iconv.new("gbk", "utf-8")
 require("libfox.siteqreader")
 require("libfox.siteshelf")
 
+
+	if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
+	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
+
 function getAllBooksToUpdate()
 	local nn = {}
 	for bookidD, booknameD, bookurlD, pageListInDB in db3_rows("SELECT id,name,url,DelURL from book where isEnd isnull or isEnd < 1") do
@@ -34,22 +38,24 @@ function getAllBooksToUpdate()
 	return nn
 end
 
-	if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
-	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
-
 db3_open(dbPath)
 
 print("##########  START  " .. dbPath .. "  ##########")
 
 local upBooksList = {}
 if bGetShelfFirst then
-	print('-- get Shelf Books First')
+--	print('-- get Shelf Books First')
 	upBooksList = compareShelfToGetNew() -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 	if nil == upBooksList then
 		upBooksList = getAllBooksToUpdate() 
 		print('-- DB Have ' .. #upBooksList .. ' Books To Update because Now MainSite shelf is not Suportted Yet')
 	else
 		print('-- Shelf Have ' .. #upBooksList .. ' Books To Update')
+	end
+	if 0 == #upBooksList then
+		db3_close()
+		print("##########  Exit  No NewPages in " .. dbPath .. "  ##########")
+		os.exit(0)
 	end
 else
 	print('-- update All Books in DB')
