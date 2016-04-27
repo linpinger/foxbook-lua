@@ -2,6 +2,8 @@
 
 -- 为了方便，将env和conn定义为全局变量，为了避免和别的变量重名，重命名了一下
 
+local tableCursors = {}  -- 全局cursor数组，在关闭数据库时显式的关闭，避免openwrt下无法自动关闭的问题
+
 function db3_open(dbPath)
 	local luasql = require "luasql.sqlite3"
 	sqlite3_env = assert(luasql.sqlite3())
@@ -16,6 +18,7 @@ end
 
 function db3_rows(sqlStr)
 	local cursor = assert(sqlite3_conn:execute(sqlStr))
+	table.insert(tableCursors, cursor)
 	return function ()
 		return cursor:fetch()
 	end
@@ -37,6 +40,11 @@ end
 
 
 function db3_close()
+	if #tableCursors > 0 then
+		for i, cc in ipairs(tableCursors) do
+			cc:close()
+		end
+	end
 	sqlite3_conn:close()
 	sqlite3_env:close()
 end

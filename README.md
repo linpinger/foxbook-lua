@@ -64,6 +64,7 @@ done
 
 **更新日志:**
 
+- 2016-04-27: 为适应OpenWRT，现移除curl库，使用socket.http代替实现，移除iconv库（openwrt下的iconv不支持中文转换），使用table来实现gbk与utf-8之间的转换
 - 2016-04-22: 第一个发布版本
 - ...: 懒得写了，就这样吧
 

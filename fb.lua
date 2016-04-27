@@ -7,17 +7,16 @@ if nil == string.match(package.path, '/') then
 	dbPath = "FoxBook.db3"
 else
 	isLinux = true
-	package.path = package.path .. ";/root/bin/?.lua;/home/fox/bin/?.lua;"
+	package.path = package.path .. ";/aaa/bin/?.lua;/root/bin/?.lua;/home/fox/bin/?.lua;"
 	dbPath = "FoxBook.db3"
 end
 
 -- 各种依赖
 require("libfox.foxnovel")
 require("libfox.foxdb3")
-require("libfox.foxcurl")
-local iconv = require("iconv")
-g2u = iconv.new("utf-8", "gbk")
-u2g = iconv.new("gbk", "utf-8")
+require("libfox.foxhttp")
+require("libfox.gbk2u")
+require("libfox.utf82gbk")
 require("libfox.siteqreader")
 require("libfox.siteshelf")
 
@@ -72,7 +71,7 @@ for i, t in ipairs(upBooksList) do
 	local bookname = t.bookname
 	local bookurl = t.bookurl
 	local pageListInDB = t.dellist
-	if not isLinux then bookname = u2g:iconv(bookname) end
+	if not isLinux then bookname = u2g(bookname) end
 -- { 不同站点下载目录
 	local gg = {}
 	if string.match(bookurl, 'm.qreader.me') then  -- qreader
@@ -81,7 +80,7 @@ for i, t in ipairs(upBooksList) do
 		local downTry = 0
 		while downTry < 4 do
 			html, httpok = gethtml(bookurl) -- 下载目录
-			if httpok then
+			if 200 == httpok then
 				if string.len(html) > 2048 then
 					break
 				end
@@ -92,7 +91,7 @@ for i, t in ipairs(upBooksList) do
 
 		-- 判断网页编码并转成utf-8
 		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-			html, isError = g2u:iconv(html)
+			html = g2u(html)
 		end
 
 		if httpok then
@@ -151,7 +150,7 @@ for i, t in ipairs(upBooksList) do
 				local downTry = 0
 				while downTry < 4 do
 					html, httpok = gethtml(realpageurl)  -- 下载页面
-					if httpok then
+					if 200 == httpok then
 						if string.len(html) > 2048 then
 							break
 						end
@@ -162,7 +161,7 @@ for i, t in ipairs(upBooksList) do
 
 				-- 判断网页编码并转成utf-8
 				if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-					html, isError = g2u:iconv(html)
+					html = g2u(html)
 				end
 
 				text = getPageText(html)
@@ -170,7 +169,7 @@ for i, t in ipairs(upBooksList) do
 			-- } 不同站点下载页面
 			db3_foxbook_addNewPage(pageurl, pagename, delNouseText(text), bookid)
 
-			if not isLinux then pagename = u2g:iconv(pagename) end
+			if not isLinux then pagename = u2g(pagename) end
 			io.write('\t    ', i, " : ", pagename, '  size: ', string.len(text), "\n")
 		end -- } 逐章下载页面
 	else -- 无新章节

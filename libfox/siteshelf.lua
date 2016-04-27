@@ -1,11 +1,10 @@
 #! /usr/bin/lua
 
-require("libfox.foxcurl")
+require("libfox.foxhttp")
 require("libfox.foxnovel")
 require("libfox.foxdb3")
-local iconv = require("iconv")
-g2u = iconv.new("utf-8", "gbk")
-u2g = iconv.new("gbk", "utf-8")
+
+require("libfox.gbk2u")
 
 -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 function compareShelfToGetNew()
@@ -59,10 +58,10 @@ function compareShelfToGetNew()
 	while downTry < 4 do
 		if 99 == siteType then
 			html, httpok = gethtml(urlShelf, postData)  -- 下载书架
-			if httpok then break end
+			if 200 == httpok then break end
 		else
 			html, httpok = gethtml(urlShelf, nil, iCookie)  -- 下载书架
-			if httpok then
+			if 200 == httpok then
 				if string.len(html) > 2048 then
 					break
 				end
@@ -76,13 +75,13 @@ function compareShelfToGetNew()
 --	html = fileread("xxxxx.html")
 
 	-- 判断网页编码并转成utf-8
-	if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then html, isError = g2u:iconv(html) end
+	if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then html = g2u(html) end
 
 	-- 循环每一记录，比较得到有新章节的书，有用的字段是: 书名, 最新章节的页面地址(可能要合成处理)，其他提示用
 	local nn = {}  -- 返回的数组元素: -- bookid, bookname, bookurl, dellist
 	local realPageURLR = ''
 	for bookurlR, booknameR, pageurlR, pagenameR in string.gmatch(html, reShelf) do
---		if bDebug then print(bookurlR, u2g:iconv(booknameR), pageurlR, u2g:iconv(pagenameR)) end
+--		if bDebug then print(bookurlR, u2g(booknameR), pageurlR, u2g(pagenameR)) end
 
 		realPageURLR = pageurlR
 		if 11 == siteType then realPageURLR = pageurlR .. ".html" end
@@ -112,7 +111,7 @@ function compareShelfToGetNew()
 			if not string.match(delListL, '\n' .. realPageURLR .. '\|') then
 				local ll = {bookid=bookidL, bookname=booknameL, bookurl=bookurlL, dellist=delListL}
 				table.insert(nn, ll)
---				if bDebug then print("NewPage: ", #nn, u2g:iconv(booknameR), u2g:iconv(pagenameR), realPageURLR) end
+--				if bDebug then print("NewPage: ", #nn, u2g(booknameR), u2g(pagenameR), realPageURLR) end
 			end
 		end
 	end
@@ -132,7 +131,7 @@ db3_open("FoxBook.db3")
 	print('-------')
 	for i, t in ipairs(nn) do
 		for k, v in pairs(t) do
-			print(k, u2g:iconv(v))
+			print(k, u2g(v))
 		end
 		print('--')
 	end
