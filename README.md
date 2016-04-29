@@ -16,6 +16,7 @@
 
 **亮点:** 
 
+- 这个Lua版本，自己写了GBK与UTF-8互转的函数，不需要iconv了，以适应openwrt下iconv无法转换GBK的问题
 - 通用小说网站规则能覆盖大部分文字站的目录及正文内容分析，不需要针对每个网站的规则
 - 本版本是用Lua脚本语言开发的，所以可以在 win/linux/mac 下运行
 - 和之前的[AHK版][foxbook-ahk](win专用/linux下wine)，[Android版][foxbook-android]使用同一个数据库
@@ -64,6 +65,7 @@ done
 
 **更新日志:**
 
+- 2016-04-29: 修复一个url的小bug，添加msn.qidian.com支持
 - 2016-04-27: 为适应OpenWRT，现移除curl库，使用socket.http代替实现，移除iconv库（openwrt下的iconv不支持中文转换），使用table来实现gbk与utf-8之间的转换
 - 2016-04-22: 第一个发布版本
 - ...: 懒得写了，就这样吧

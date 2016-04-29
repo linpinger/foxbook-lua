@@ -18,6 +18,7 @@ require("libfox.foxhttp")
 require("libfox.gbk2u")
 require("libfox.utf82gbk")
 require("libfox.siteqreader")
+require("libfox.siteqidian")
 require("libfox.siteshelf")
 
 
@@ -119,7 +120,7 @@ for i, t in ipairs(upBooksList) do
 						bFound = true
 					end
 				else
-					if not string.match(pageListInDB, '\n' .. gg[j]["l"] .. '\|') then
+					if not string.match(pageListInDB, '\n' .. string.gsub(gg[j]["l"], '%?', '%%?') .. '\|') then
 						table.insert(nn, gg[j])
 					end
 				end
@@ -146,6 +147,8 @@ for i, t in ipairs(upBooksList) do
 			local text = ""
 			if string.match(bookurl, 'm.qreader.me') then
 				text = qreader_GetContent(bookurl .. pageurl)
+			elseif string.match(bookurl, 'msn.qidian.com') then
+				text = qidian_GetContent(bookurl, pageurl)
 			else
 				local downTry = 0
 				while downTry < 4 do
