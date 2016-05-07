@@ -210,7 +210,20 @@ end
 
 -- } 通用获取网页文本内容，就是最长的<div>中的内容
 
--- 删除文本尾部乱七八糟的玩意儿
+-- { 精简已删除列表
+function SimplifyDelList(dellist)
+	local tbLine = {}
+	for line in string.gmatch(dellist, "([^\r\n|]*|[^\r\n]*)[\r\n]") do
+		table.insert(tbLine, line)
+	end
+	if #tbLine > 9 then
+		dellist = table.concat(tbLine, "\n", #tbLine - 8)
+	end
+	return dellist
+end
+-- } 精简已删除列表
+
+-- { 删除文本尾部乱七八糟的玩意儿
 function delNouseText(text)
 	local xx = string.match(text, '([\(（]?未完待续.*)$')
 	if ( nil == xx ) then
@@ -221,6 +234,7 @@ function delNouseText(text)
 	end
 	return text
 end
+-- } 删除文本尾部乱七八糟的玩意儿
 
 --- }
 

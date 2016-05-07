@@ -14,13 +14,6 @@ end
 -- 各种依赖
 require("libfox.foxnovel")
 require("libfox.foxdb3")
-require("libfox.foxhttp")
-require("libfox.gbk2u")
-require("libfox.utf82gbk")
-require("libfox.siteqreader")
-require("libfox.siteqidian")
-require("libfox.siteshelf")
-
 
 	if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
 	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
@@ -45,6 +38,7 @@ print("##########  START  " .. dbPath .. "  ##########")
 local upBooksList = {}
 if bGetShelfFirst then
 --	print('-- get Shelf Books First')
+	require("libfox.siteshelf")
 	upBooksList = compareShelfToGetNew() -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 	if nil == upBooksList then
 		upBooksList = getAllBooksToUpdate() 
@@ -65,6 +59,7 @@ end
 
 
 -- { 循环要更新的书
+	require("libfox.foxhttp")
 	local allNewCount = 0
 
 for i, t in ipairs(upBooksList) do
@@ -72,10 +67,14 @@ for i, t in ipairs(upBooksList) do
 	local bookname = t.bookname
 	local bookurl = t.bookurl
 	local pageListInDB = t.dellist
-	if not isLinux then bookname = u2g(bookname) end
+	if not isLinux then
+		require("libfox.utf82gbk")
+		bookname = u2g(bookname)
+	end
 -- { 不同站点下载目录
 	local gg = {}
 	if string.match(bookurl, 'm.qreader.me') then  -- qreader
+		require("libfox.siteqreader")
 		gg = qreader_GetIndex(bookurl)
 	else -- 通用站点
 		local downTry = 0
@@ -92,6 +91,7 @@ for i, t in ipairs(upBooksList) do
 
 		-- 判断网页编码并转成utf-8
 		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
+			require("libfox.gbk2u")
 			html = g2u(html)
 		end
 
@@ -146,8 +146,10 @@ for i, t in ipairs(upBooksList) do
 			-- { 不同站点下载页面
 			local text = ""
 			if string.match(bookurl, 'm.qreader.me') then
+				require("libfox.siteqreader")
 				text = qreader_GetContent(bookurl .. pageurl)
 			elseif string.match(bookurl, 'msn.qidian.com') then
+				require("libfox.siteqidian")
 				text = qidian_GetContent(bookurl, pageurl)
 			else
 				local downTry = 0
@@ -164,6 +166,7 @@ for i, t in ipairs(upBooksList) do
 
 				-- 判断网页编码并转成utf-8
 				if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
+					require("libfox.gbk2u")
 					html = g2u(html)
 				end
 
@@ -172,7 +175,10 @@ for i, t in ipairs(upBooksList) do
 			-- } 不同站点下载页面
 			db3_foxbook_addNewPage(pageurl, pagename, delNouseText(text), bookid)
 
-			if not isLinux then pagename = u2g(pagename) end
+			if not isLinux then
+				require("libfox.utf82gbk")
+				pagename = u2g(pagename)
+			end
 			io.write('\t    ', i, " : ", pagename, '  size: ', string.len(text), "\n")
 		end -- } 逐章下载页面
 	else -- 无新章节

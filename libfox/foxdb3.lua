@@ -142,4 +142,28 @@ function db3_foxbook_sortBookDesc(bDesc)
 	sqlite3_conn:setautocommit(true)
 end
 
+-- 删除指定书中的所有章节
+function db3_foxbook_DeleteBookAllPages(iBookID)
+	local bookid, bookname, dellist
+	for ID,NAME,DelURL in db3_rows("SELECT id,name,DelURL from book where id = " .. iBookID) do
+		bookid = ID
+		bookname = NAME
+		dellist = DelURL
+	end
+	for NAME, URL in db3_rows("SELECT name,url from page where bookid = " .. iBookID) do
+		dellist = dellist .. URL .. "|" .. NAME .. "\n"
+	end
+	if nil == dellist then return end
+	require "libfox.foxnovel"
+	dellist = SimplifyDelList(dellist) -- 精简dellist
+	sqlite3_conn:execute(string.format([[ update Book set DelURL='%s' where ID = %d ]], sqlite3_conn:escape(dellist), iBookID ))
+	sqlite3_conn:execute("Delete From Page where bookid = " .. iBookID)
+end
+
+-- 清空所有有章节的书
+function db3_foxbook_DeleteAllBookPages()
+	for bookid in db3_rows("select distinct(bookid) from page") do
+		db3_foxbook_DeleteBookAllPages(bookid)
+	end
+end
 

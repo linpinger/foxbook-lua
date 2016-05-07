@@ -1,13 +1,10 @@
 #! /usr/bin/lua
 
-require("libfox.foxnovel")
-require("libfox.foxhttp")
-require("libfox.gbk2u")
--- require("libfox.utf82gbk")
-
 -- function qidian_GetIndex(dbBookUrl) end
 
 function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=1003290088&chapterid=306910701
+	require("libfox.foxhttp")
+	require("libfox.gbk2u")
 	local bookid, pageid = string.match(PgURL, 'bookid=([0-9]*)&chapterid=([0-9]*)')
 	local pageurl = "http://files.qidian.com/Author" .. ( 1 + math.fmod(tonumber(bookid), 8) ) .. "/" .. bookid .. "/" .. pageid .. ".txt"
 

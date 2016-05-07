@@ -2,10 +2,9 @@
 
 -- http://w3.impa.br/~diego/software/luasocket/http.html
 
-local http = require("socket.http")
--- local ltn12 = require("ltn12")
-
 function gethtml(inURL, postData, cookie)
+	local http = require("socket.http")
+--	local ltn12 = require("ltn12")
 	local html = {}
 	local tbhtml = {}
 	tbhtml.url = inURL

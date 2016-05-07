@@ -3,10 +3,8 @@
 -- https://github.com/grafi-tt/lunajson
 -- http://lua-users.org/wiki/JsonModules
 
-	require("libfox.foxhttp")
-	require("libfox.gbk2u")
-
 function qreader_GetIndex(dbBookUrl) -- dbBookUrl = "http://m.qreader.me/query_catalog.php?bid=4872388"
+	require("libfox.foxhttp")
 	local postData = '{"id":' .. string.match(dbBookUrl, 'bid=([0-9]*)') .. '}'
 
 	local html = ''
@@ -32,6 +30,8 @@ function qreader_GetIndex(dbBookUrl) -- dbBookUrl = "http://m.qreader.me/query_c
 end
 
 function qreader_GetContent(PgURL) -- "http://m.qreader.me/query_catalog.php?bid=4872388#321"
+	require("libfox.foxhttp")
+	require("libfox.gbk2u")
 	local bookid, pageid = string.match(PgURL, 'bid=([0-9]*)#([0-9]*)')
 	local postData = '{"id":' .. bookid .. ',"cid":' .. pageid .. '}'
 

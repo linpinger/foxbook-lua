@@ -1,13 +1,10 @@
 #! /usr/bin/lua
 
-require("libfox.foxhttp")
-require("libfox.foxnovel")
-require("libfox.foxdb3")
-
-require("libfox.gbk2u")
-
 -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 function compareShelfToGetNew()
+	require("libfox.foxdb3")
+	require("libfox.foxhttp")
+
 	-- 获取主要的url: mainURL
 	local mainURL = ''
 	for cc in db3_rows("select URL from book where ( isEnd isnull or isEnd < 1 ) limit 1") do mainURL = cc end
@@ -75,7 +72,10 @@ function compareShelfToGetNew()
 --	html = fileread("xxxxx.html")
 
 	-- 判断网页编码并转成utf-8
-	if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then html = g2u(html) end
+	if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
+		require("libfox.gbk2u")
+		html = g2u(html)
+	end
 
 	-- 循环每一记录，比较得到有新章节的书，有用的字段是: 书名, 最新章节的页面地址(可能要合成处理)，其他提示用
 	local nn = {}  -- 返回的数组元素: -- bookid, bookname, bookurl, dellist
