@@ -73,8 +73,8 @@ function compareShelfToGetNew()
 
 	-- 判断网页编码并转成utf-8
 	if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-		require("libfox.gbk2u")
-		html = g2u(html)
+		require("libfox.utf8gbk")
+		html = utf8gbk(html, true)
 	end
 
 	-- 循环每一记录，比较得到有新章节的书，有用的字段是: 书名, 最新章节的页面地址(可能要合成处理)，其他提示用

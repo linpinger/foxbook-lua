@@ -44,7 +44,9 @@ if bGetShelfFirst then
 		upBooksList = getAllBooksToUpdate() 
 		print('-- DB Have ' .. #upBooksList .. ' Books To Update because Now MainSite shelf is not Suportted Yet')
 	else
-		print('-- Shelf Have ' .. #upBooksList .. ' Books To Update')
+		if #upBooksList > 0 then
+			print('-- Shelf Have ' .. #upBooksList .. ' Books To Update')
+		end
 	end
 	if 0 == #upBooksList then
 		db3_close()
@@ -68,8 +70,8 @@ for i, t in ipairs(upBooksList) do
 	local bookurl = t.bookurl
 	local pageListInDB = t.dellist
 	if not isLinux then
-		require("libfox.utf82gbk")
-		bookname = u2g(bookname)
+		require("libfox.utf8gbk")
+		bookname = utf8gbk(bookname, false)
 	end
 -- { 不同站点下载目录
 	local gg = {}
@@ -91,13 +93,14 @@ for i, t in ipairs(upBooksList) do
 
 		-- 判断网页编码并转成utf-8
 		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-			require("libfox.gbk2u")
-			html = g2u(html)
+			require("libfox.utf8gbk")
+			html = utf8gbk(html, true)
 		end
 
 		if httpok then
 			if string.len(html) > 2048 then
 				gg = getIndexs(html) -- 分析目录
+				html = nil
 			end
 		end
 	end
@@ -134,8 +137,7 @@ for i, t in ipairs(upBooksList) do
 -- { 有新章节，下载
 	if #gg > 0 then  -- 有新章节
 		allNewCount = allNewCount + #gg
-		if nil == html then html = '' end
-		print(bookid, #gg, 'new in', bookname, string.len(html))
+		print(bookid, #gg, 'new in', bookname)
 
 		-- { 逐章下载页面
 		for i=1, #gg do
@@ -166,24 +168,24 @@ for i, t in ipairs(upBooksList) do
 
 				-- 判断网页编码并转成utf-8
 				if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-					require("libfox.gbk2u")
-					html = g2u(html)
+					require("libfox.utf8gbk")
+					html = utf8gbk(html, true)
 				end
 
 				text = getPageText(html)
+				html = nil
 			end
 			-- } 不同站点下载页面
 			db3_foxbook_addNewPage(pageurl, pagename, delNouseText(text), bookid)
 
 			if not isLinux then
-				require("libfox.utf82gbk")
-				pagename = u2g(pagename)
+				require("libfox.utf8gbk")
+				pagename = utf8gbk(pagename, false)
 			end
 			io.write('\t    ', i, " : ", pagename, '  size: ', string.len(text), "\n")
 		end -- } 逐章下载页面
 	else -- 无新章节
-		if nil == html then html = '' end
-		print(bookid, 0, bookname, string.len(html))
+		print(bookid, 0, bookname)
 	end
 -- } 有新章节，下载
 end

@@ -4,7 +4,6 @@
 
 function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=1003290088&chapterid=306910701
 	require("libfox.foxhttp")
-	require("libfox.gbk2u")
 	local bookid, pageid = string.match(PgURL, 'bookid=([0-9]*)&chapterid=([0-9]*)')
 	local pageurl = "http://files.qidian.com/Author" .. ( 1 + math.fmod(tonumber(bookid), 8) ) .. "/" .. bookid .. "/" .. pageid .. ".txt"
 
@@ -16,7 +15,8 @@ function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=100329008
 		downTry = downTry + 1
 		print("warn: downPage retry:", downTry, string.len(html))
 	end
-	html = g2u(html)
+	require("libfox.utf8gbk")
+	html = utf8gbk(html, true)
 	html = string.gsub(html, "document.write%(%'", '')
 	html = string.gsub(html, "%'%);", '')
 	html = string.gsub(html, "<p>", '\n')

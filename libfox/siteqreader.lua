@@ -31,7 +31,6 @@ end
 
 function qreader_GetContent(PgURL) -- "http://m.qreader.me/query_catalog.php?bid=4872388#321"
 	require("libfox.foxhttp")
-	require("libfox.gbk2u")
 	local bookid, pageid = string.match(PgURL, 'bid=([0-9]*)#([0-9]*)')
 	local postData = '{"id":' .. bookid .. ',"cid":' .. pageid .. '}'
 
@@ -44,7 +43,8 @@ function qreader_GetContent(PgURL) -- "http://m.qreader.me/query_catalog.php?bid
 		print("warn: downPage retry:", downTry, string.len(html))
 	end
 
-	html = g2u(html)
+	require("libfox.utf8gbk")
+	html = utf8gbk(html, true)
 
 	html = string.gsub(html, '　　', '')  -- 删除所有空白
 

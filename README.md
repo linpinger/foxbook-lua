@@ -65,6 +65,7 @@ done
 
 **更新日志:**
 
+- 2016-05-09: 重写utf8和gbk互转函数，内存是原来的一半，速度是原来的三倍，在OpenWRT下应该可以同时开几个进程了
 - 2016-05-07: 调整require顺序以减少内存使用，尤其是g2u或u2g函数，添加: 删除已读章节的函数
 - 2016-04-29: 修复一个url的小bug，添加msn.qidian.com支持
 - 2016-04-27: 为适应OpenWRT，现移除curl库，使用socket.http代替实现，移除iconv库（openwrt下的iconv不支持中文转换），使用table来实现gbk与utf-8之间的转换
