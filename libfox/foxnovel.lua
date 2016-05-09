@@ -217,7 +217,7 @@ function SimplifyDelList(dellist)
 		table.insert(tbLine, line)
 	end
 	if #tbLine > 9 then
-		dellist = table.concat(tbLine, "\n", #tbLine - 8)
+		dellist = table.concat(tbLine, "\n", #tbLine - 8) .. "\n"
 	end
 	return dellist
 end
