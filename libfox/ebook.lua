@@ -201,7 +201,10 @@ function ebook_build()
 			os.execute(tmpDrv .. ' && cd "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf')
 			os.execute(tmpDrv .. ' && cd "' .. ebook.tmprootdir .. '" && move /Y FoxMake.mobi ..')
 		end
-		if "linux" == ebook.ostype then os.execute('cd "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf && mv -f FoxMake.mobi ..') end
+		if "linux" == ebook.ostype then
+			os.execute('cd "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf')
+			os.execute('cd "' .. ebook.tmprootdir .. '" && mv -f FoxMake.mobi ..')
+		end
 	end
 	if ebook.format == "epub" then
 		if "win" == ebook.ostype then
