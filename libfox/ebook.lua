@@ -193,13 +193,11 @@ function ebook_build()
 	local_createNCX()
 	local_createOPF()
 
-	local tmpDrv = "D:"
-	if "win" == ebook.ostype then tmpDrv = string.sub(ebook.tmprootdir, 1, 2) end
 	-- 调用kindlegen/zip生成mobi/epub
 	if ebook.format == "mobi" then
 		if "win" == ebook.ostype then
-			os.execute(tmpDrv .. ' && cd "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf')
-			os.execute(tmpDrv .. ' && cd "' .. ebook.tmprootdir .. '" && move /Y FoxMake.mobi ..')
+			os.execute('cd /D "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf')
+			os.execute('cd /D "' .. ebook.tmprootdir .. '" && move /Y FoxMake.mobi ..')
 		end
 		if "linux" == ebook.ostype then
 			os.execute('cd "' .. ebook.tmprootdir .. '" && kindlegen FoxMake.opf')
@@ -208,7 +206,7 @@ function ebook_build()
 	end
 	if ebook.format == "epub" then
 		if "win" == ebook.ostype then
-			os.execute(tmpDrv .. ' && cd "' .. ebook.tmprootdir .. '" && zip -0Xq ../FoxMake.epub mimetype && zip -Xr9Dq ../FoxMake.epub *')
+			os.execute('cd /D "' .. ebook.tmprootdir .. '" && zip -0Xq ../FoxMake.epub mimetype && zip -Xr9Dq ../FoxMake.epub *')
 		end
 		if "linux" == ebook.ostype then
 			os.execute('cd "' .. ebook.tmprootdir .. '" && zip -0Xq ../FoxMake.epub mimetype && zip -Xr9Dq ../FoxMake.epub *')
@@ -237,17 +235,34 @@ ebook_build()
 --]] -- } main
 
 --[[ -- { example:db3toebook
-local dbPath = 'FoxBook.db3'
+#! /usr/bin/lua
+
+package.path = package.path .. ";/aaa/bin/?.lua;/root/bin/?.lua;/home/fox/bin/?.lua;"
+-- package.path = package.path .. ";C:\\bin\\Lua\\?.lua;D:\\bin\\Lua\\?.lua;"
+dbPath = "FoxBook.db3"
+
+if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
+
 require('libfox.foxdb3')
 db3_open(dbPath)
 
 require('libfox.ebook')
-ebook.tmpdir = 'D:\\tmp'
--- ebook.format = 'epub'
+ebook.tmpdir = '/dev/shm'
 ebook_new("all_lua")
 
-for tt, cc in db3_rows("SELECT name,content from page order by bookid, id") do
-	ebook_addchapter(tt, '　　' .. string.gsub(cc, '\n', '<br/>\n　　') .. '<br/>\n')
+local bidname = {}
+for id, name in db3_rows("SELECT id,name from book") do
+	bidname["bid" .. id] = name
+end
+
+local prebid = 0
+for bid, tt, cc in db3_rows("SELECT bookid, name,content from page order by bookid, id") do
+	if prebid == bid then
+		ebook_addchapter('　　' .. tt, '　　' .. string.gsub(cc, '\n', '<br/>\n　　') .. '<br/>\n')
+	else
+		ebook_addchapter(bidname["bid" .. bid] .. '●' .. tt, '　　' .. string.gsub(cc, '\n', '<br/>\n　　') .. '<br/>\n')
+	end
+	prebid = bid
 end
 db3_close()
 
