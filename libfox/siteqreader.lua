@@ -5,7 +5,8 @@
 
 function qreader_GetIndex(dbBookUrl) -- dbBookUrl = "http://m.qreader.me/query_catalog.php?bid=4872388"
 	require("libfox.foxhttp")
-	local postData = '{"id":' .. string.match(dbBookUrl, 'bid=([0-9]*)') .. '}'
+	local bid = string.match(dbBookUrl, 'bid=([0-9]*)')
+	local postData = '{"id":' .. bid .. '}'
 
 	local html = ''
 	local downTry = 0
@@ -13,7 +14,7 @@ function qreader_GetIndex(dbBookUrl) -- dbBookUrl = "http://m.qreader.me/query_c
 		html, httpok = gethtml("http://m.qreader.me/query_catalog.php", postData) -- 下载目录
 		if 200 == httpok then break end
 		downTry = downTry + 1
-		print("warn: downPage retry:", downTry, string.len(html))
+		print("    Download: retry: " .. downTry .. "  bid: " .. bid .. "  len(html): " .. string.len(html))
 	end
 
 	local lunajson = require("libfox.lunajson")
@@ -40,7 +41,7 @@ function qreader_GetContent(PgURL) -- "http://m.qreader.me/query_catalog.php?bid
 		html, httpok = gethtml("http://chapter.qreader.me/download_chapter.php", postData) -- 下载章节
 		if 200 == httpok then break end
 		downTry = downTry + 1
-		print("warn: downPage retry:", downTry, string.len(html))
+		print("    Download: retry: " .. downTry .. "  bid: " .. bookid .. "  len(html): " .. string.len(html))
 	end
 
 	require("libfox.utf8gbk")

@@ -13,7 +13,7 @@ function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=100329008
 		html, httpok = gethtml(pageurl) -- 下载章节
 		if 200 == httpok then break end
 		downTry = downTry + 1
-		print("warn: downPage retry:", downTry, string.len(html))
+		print("    Download: retry: " .. downTry .. "  QDid: " .. bookid .. "  len(html): " .. string.len(html))
 	end
 	require("libfox.utf8gbk")
 	html = utf8gbk(html, true)

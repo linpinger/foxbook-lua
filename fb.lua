@@ -1,22 +1,22 @@
 #! /usr/bin/lua
 
+	local dbPath = "FoxBook.db3"
+	if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
+	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
+
+	local dbName = string.match(dbPath, "([^\\/]*).db3")
 -- 判断是不是Linux环境
 if nil == string.match(package.path, '/') then
 	isLinux = false
 	package.path = package.path .. ";C:\\bin\\Lua\\?.lua;D:\\bin\\Lua\\?.lua;"
-	dbPath = "FoxBook.db3"
 else
 	isLinux = true
 	package.path = package.path .. ";/aaa/bin/?.lua;/root/bin/?.lua;/home/fox/bin/?.lua;"
-	dbPath = "FoxBook.db3"
 end
 
 -- 各种依赖
 require("libfox.foxnovel")
 require("libfox.foxdb3")
-
-	if nil ~= arg[1] then dbPath = arg[1] end -- 命令行分析
-	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
 
 function getAllBooksToUpdate()
 	local nn = {}
@@ -33,30 +33,28 @@ end
 
 db3_open(dbPath)
 
-print("##########  START  " .. dbPath .. "  ##########")
+print("##  " .. dbPath .. "  START")
 
 local upBooksList = {}
 if bGetShelfFirst then
---	print('-- get Shelf Books First')
 	require("libfox.siteshelf")
 	upBooksList = compareShelfToGetNew() -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 	if nil == upBooksList then
 		upBooksList = getAllBooksToUpdate() 
-		print('-- DB Have ' .. #upBooksList .. ' Books To Update because Now MainSite shelf is not Suportted Yet')
+		print('**  ' .. dbName .. ' Have ' .. #upBooksList .. ' Books Update, Maybe shelf isnot suport or no cookie')
 	else
 		if #upBooksList > 0 then
-			print('-- Shelf Have ' .. #upBooksList .. ' Books To Update')
+			print('**  ' .. dbName .. ' Shelf Have ' .. #upBooksList .. ' Books To Update')
 		end
 	end
 	if 0 == #upBooksList then
 		db3_close()
-		print("##########  Exit  No NewPages in " .. dbPath .. "  ##########")
+		print("##  " .. dbName .. "  Exit  No NewPages")
 		os.exit(0)
 	end
 else
-	print('-- update All Books in DB')
 	upBooksList = getAllBooksToUpdate() 
-	print('-- DB Have ' .. #upBooksList .. ' Books To Update')
+	print('**  ' .. dbName .. ' Have ' .. #upBooksList .. ' Books To Update')
 end
 
 
@@ -88,7 +86,7 @@ for i, t in ipairs(upBooksList) do
 				end
 			end
 			downTry = downTry + 1
-			print(bookid, "warn: downIndex retry:", downTry, string.len(html))
+			print("    Download: retry: " .. downTry .. "  bid: " .. bookid .. "  len(html): " .. string.len(html))
 		end
 
 		-- 判断网页编码并转成utf-8
@@ -112,12 +110,7 @@ for i, t in ipairs(upBooksList) do
 		if string.len(pageListInDB) > 5 then
 			local firstline = string.match(pageListInDB, '([^|]-)\|')
 			local bFound = false
-			if #gg > 50 then
-				j = #gg - 50
-			else
-				j = 1
-			end
-			for j=j, #gg do  -- 这里的50是如果不是新书时，值显示最后50条章节
+			for j=1, #gg do
 				if not bFound then
 					if gg[j]["l"] == firstline then
 						bFound = true
@@ -137,7 +130,7 @@ for i, t in ipairs(upBooksList) do
 -- { 有新章节，下载
 	if #gg > 0 then  -- 有新章节
 		allNewCount = allNewCount + #gg
-		print(bookid, #gg, 'new in', bookname)
+		print('--  ' .. dbName .. " : " .. bookname .. " Have " .. #gg .. " NewPages")
 
 		-- { 逐章下载页面
 		for i=1, #gg do
@@ -163,7 +156,7 @@ for i, t in ipairs(upBooksList) do
 						end
 					end
 					downTry = downTry + 1
-					print(bookid, "warn: downPage retry:", downTry, string.len(html))
+					print("    Download: retry: " .. downTry .. "  bid: " .. bookid .. "  len(html): " .. string.len(html))
 				end
 
 				-- 判断网页编码并转成utf-8
@@ -176,16 +169,17 @@ for i, t in ipairs(upBooksList) do
 				html = nil
 			end
 			-- } 不同站点下载页面
-			db3_foxbook_addNewPage(pageurl, pagename, delNouseText(text), bookid)
+			local contentLen = math.ceil(string.len(text) / 3)
+			db3_foxbook_addNewPage(pageurl, pagename, delNouseText(text), contentLen, bookid)
 
 			if not isLinux then
 				require("libfox.utf8gbk")
 				pagename = utf8gbk(pagename, false)
 			end
-			io.write('\t    ', i, " : ", pagename, '  size: ', string.len(text), "\n")
+			print('++  ' .. dbName .. " : " .. i .. " : " .. pagename .. " Size: " .. contentLen)
 		end -- } 逐章下载页面
 	else -- 无新章节
-		print(bookid, 0, bookname)
+		print('--  ' .. dbName .. " : " .. bookname .. " Have 0 NewPages")
 	end
 -- } 有新章节，下载
 end
@@ -194,6 +188,6 @@ db3_exec('update page set charcount=length(Content)') -- 更新charcount，因�
 db3_foxbook_sortBookDesc(true) -- 倒序排列
 db3_close()
 
-print("##########  DONE  Got " .. allNewCount .. " NewPages  " .. dbPath .. "  ##########")
+print("##  " .. dbName .. "  DONE  GOT " .. allNewCount .. " NewPages")
 
 

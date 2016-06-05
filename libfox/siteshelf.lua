@@ -47,6 +47,7 @@ function compareShelfToGetNew()
 		-- 根据URL获得网站cookie: iCookie
 		for cc in db3_rows("SELECT cookie from config where site like '%" .. string.match(mainURL, '(http://[^/]*)/') .. "%'") do iCookie = cc end
 		iCookie = cookie2Field(iCookie)
+		if '' == iCookie then return nil end  -- 当不存在cookie时，返回nil
 	end
 
 	-- 下载获取网页字符串: html
@@ -66,7 +67,7 @@ function compareShelfToGetNew()
 		end
 		downTry = downTry + 1
 		if nil == html then html = '' end
-		print(bookid, "warn: downShelf retry:", downTry, string.len(html))
+		print("    Download: retry: " .. downTry .. "  Shelf  len(html): " .. string.len(html))
 	end
 --	filewrite(html, "xxxxx.html")
 --	html = fileread("xxxxx.html")

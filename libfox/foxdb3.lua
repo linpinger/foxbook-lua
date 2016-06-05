@@ -79,8 +79,8 @@ db3_close()
 
 -- 以下是foxbook专用的数据库相关函数
 
-function db3_foxbook_addNewPage(iURL, iName, iText, iBookID)
-	sqlite3_conn:execute(string.format([[ insert into page(url, Name, Mark, Content, BookID, DownTime) values('%s', '%s', 'text', '%s', %d, '%s') ]], iURL, sqlite3_conn:escape(iName), sqlite3_conn:escape(iText), iBookID, os.date('%Y%m%d%H%M%S') ))
+function db3_foxbook_addNewPage(iURL, iName, iText, iTextLen, iBookID)
+	sqlite3_conn:execute(string.format([[ insert into page(url, Name, Mark, Content, CharCount, BookID, DownTime) values('%s', '%s', 'text', '%s', %d, %d, '%s') ]], iURL, sqlite3_conn:escape(iName), sqlite3_conn:escape(iText), iTextLen, iBookID, os.date('%Y%m%d%H%M%S') ))
 end
 
 function ReGenID(bBook, bDesc, NowSQL)
