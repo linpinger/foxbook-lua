@@ -4,6 +4,8 @@
 
 function gethtml(inURL, postData, cookie)
 	local http = require("socket.http")
+	http.TIMEOUT = 5
+--	http.USERAGENT = "IE8"  -- 这个也有效
 --	local ltn12 = require("ltn12")
 	local html = {}
 	local tbhtml = {}
