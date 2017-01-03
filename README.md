@@ -33,27 +33,29 @@
 
 - 先到[LuaDist](http://luadist.org/) 下载win版或linux64版或mac版
 - 解压压缩文件到 D:\bin\Lua 下，此时Lua文件夹下应有bin include lib share 文件夹
-- 下载源码解压到 D:\bin\Lua 下，应多出 libfox文件夹 fb.lua 文件
+- 下载源码解压到 D:\bin\Lua 下，应多出 libfox文件夹 fbDB3.lua fbXML.lua 文件
+- 2016-12-29: 这两个版本是区别 DB3和XML格式的，书架的cookie文件应保存在 FoxBook.cookie文件中，格式: <cookie><sitename>cookieStr</sitename><sitename>another CookieStr</sitename></cookie>
 - 命令行下使用以下命令更新
 
 ```Lua
-D:\bin\lua\bin\lua.exe D:\bin\Lua\fb.lua D:\xxx\FoxBook.db3
+D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDB3.lua D:\xxx\FoxBook.db3
+D:\bin\lua\bin\lua.exe D:\bin\Lua\fbXML.lua D:\xxx\FoxBook.xml
 ```
 
 **其他小提示:**
 
 - linux32版的luadist版本可能会在[baidu网盘][pan_baidu]提供，其实编译方法已经在[这篇日志](http://linpinger.github.io/usr/2016-03-30_Lua.html)里说明了，如果有小伙伴要可以发邮件找我
 - 各小说站(目前只支持13xs,biquge,dajiadu,qreader)，注册账号，然后将自己的小说添加到书架，然后用IE导出cookie，填入数据库的config表中的cookie字段，site字段就是网址类似http://www.biquge.com.tw
-- fb.lua默认先比较书架与数据库的差异，可以修改fb.lua关闭这功能，也就是修改 local bGetShelfFirst = true 为 local bGetShelfFirst = false
+- fbDB3.lua默认先比较书架与数据库的差异，可以修改fbDB3.lua关闭这功能，也就是修改 local bGetShelfFirst = true 为 local bGetShelfFirst = false
 - 可以使用多开进程更新多个数据库，速度杠杠滴
 - win下单cmd多进程运行
 ```shell
-cmd /c start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fb.lua FoxBook.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fb.lua biquge.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fb.lua dajiadu.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fb.lua qreader.db3
+cmd /c start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDb3.lua FoxBook.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDb3.lua biquge.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDb3.lua dajiadu.db3 & start /b D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDb3.lua qreader.db3
 ```
 - linux下多进程运行
 ```shell
 for iDB in *.db3 ; do
-	lua /root/bin/fb.lua $iDB &
+	lua /root/bin/fbDB3.lua $iDB &
 done
 ```
 
@@ -64,7 +66,8 @@ done
 
 
 **更新日志:**
-
+- 2017-01-03: 移除无用的标签bookloc,pageloc
+- 2016-12-29: 将fb.lua更名为 fbDB3.lua，新增 fbXML.lua 以适应新版采用xml作为存储格式，更好跨平台，现可只依赖socket(亦可使用wget替代，以达到只需要lua主程序即可运行)
 - 2016-10-13: http库 设置timeout=5s，发现原来可以直接设置UserAgent，不用拐太多弯，可以先留着
 - 2016-06-05: 修复一个无cookie的bug以及提示文字
 - 2016-05-19: 添加ebook.lua库，它就是用来制作epub/mobi的，呵呵呵，源码里面有栗子，遗憾的是kindlegen木有openwrt版的，否则就完美了

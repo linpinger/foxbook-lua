@@ -17,6 +17,11 @@ function filewrite(nr, oFilePath)
 	f:write(nr)
 	f:close()
 end
+function filewriteB(nr, oFilePath)
+	local f = assert(io.open(oFilePath, "wb"))
+	f:write(nr)
+	f:close()
+end
 
 -- URL地址的合成
 function getFullURL(iNowUrl, iBaseUrl)
