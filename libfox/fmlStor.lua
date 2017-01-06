@@ -15,11 +15,11 @@ function loadCookie(cookiePath)
 	return cookie
 end
 
-function loadXML(xmlPath)
+function loadFML(fmlPath)
 	require "libfox.foxnovel"
-	local xml = fileread(xmlPath)
+	local fml = fileread(fmlPath)
 	local shelf = {}
-	for bookStr in string.gmatch(xml, "<novel>(.-)</novel>") do
+	for bookStr in string.gmatch(fml, "<novel>(.-)</novel>") do
 		local book = {}
 		book.bookname   = getValue(bookStr, "bookname")
 		book.bookurl    = getValue(bookStr, "bookurl")
@@ -43,36 +43,36 @@ function loadXML(xmlPath)
 	return shelf
 end
 
-function saveXML(shelf, savePath)
-	local xml = {}
-	table.insert(xml, '<?xml version="1.0" encoding="utf-8"?>\n\n<shelf>\n')
+function saveFML(shelf, savePath)
+	local fml = {}
+	table.insert(fml, '<?xml version="1.0" encoding="utf-8"?>\n\n<shelf>\n')
 	for i, book in ipairs(shelf) do
-		table.insert(xml, '<novel>')
-		table.insert(xml, '\t<bookname>' .. book.bookname .. '</bookname>')
-		table.insert(xml, '\t<bookurl>' .. book.bookurl .. '</bookurl>')
-		table.insert(xml, '\t<delurl>' .. book.delurl .. '</delurl>')
-		table.insert(xml, '\t<statu>' .. book.statu .. '</statu>')
-		table.insert(xml, '\t<qidianBookID>' .. book.qidianBookID .. '</qidianBookID>')
-		table.insert(xml, '\t<author>' .. book.author .. '</author>')
-		table.insert(xml, '<chapters>')
+		table.insert(fml, '<novel>')
+		table.insert(fml, '\t<bookname>' .. book.bookname .. '</bookname>')
+		table.insert(fml, '\t<bookurl>' .. book.bookurl .. '</bookurl>')
+		table.insert(fml, '\t<delurl>' .. book.delurl .. '</delurl>')
+		table.insert(fml, '\t<statu>' .. book.statu .. '</statu>')
+		table.insert(fml, '\t<qidianBookID>' .. book.qidianBookID .. '</qidianBookID>')
+		table.insert(fml, '\t<author>' .. book.author .. '</author>')
+		table.insert(fml, '<chapters>')
 		for j, page in ipairs(book.chapters) do
-			table.insert(xml, '<page>')
-			table.insert(xml, '\t<pagename>' .. page.pagename .. '</pagename>')
-			table.insert(xml, '\t<pageurl>' .. page.pageurl .. '</pageurl>')
-			table.insert(xml, '\t<content>' .. page.content .. '</content>')
-			table.insert(xml, '\t<size>' .. page.size .. '</size>')
-			table.insert(xml, '</page>')
+			table.insert(fml, '<page>')
+			table.insert(fml, '\t<pagename>' .. page.pagename .. '</pagename>')
+			table.insert(fml, '\t<pageurl>' .. page.pageurl .. '</pageurl>')
+			table.insert(fml, '\t<content>' .. page.content .. '</content>')
+			table.insert(fml, '\t<size>' .. page.size .. '</size>')
+			table.insert(fml, '</page>')
 		end
-		table.insert(xml, '</chapters>')
-		table.insert(xml, '</novel>\n')
+		table.insert(fml, '</chapters>')
+		table.insert(fml, '</novel>\n')
 	end
-	table.insert(xml, '</shelf>\n')
+	table.insert(fml, '</shelf>\n')
 	require "libfox.foxnovel"
-	filewriteB(table.concat(xml, '\n'), savePath)
+	filewriteB(table.concat(fml, '\n'), savePath)
 end
 
 
--- shelf = loadXML("FoxBook.xml")
+-- shelf = loadFML("FoxBook.fml")
 -- print("Book Count=" .. #shelf)
--- saveXML(shelf, "new.xml")
+-- saveFML(shelf, "new.fml")
 

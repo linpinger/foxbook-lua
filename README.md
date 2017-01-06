@@ -33,13 +33,13 @@
 
 - 先到[LuaDist](http://luadist.org/) 下载win版或linux64版或mac版
 - 解压压缩文件到 D:\bin\Lua 下，此时Lua文件夹下应有bin include lib share 文件夹
-- 下载源码解压到 D:\bin\Lua 下，应多出 libfox文件夹 fbDB3.lua fbXML.lua 文件
-- 2016-12-29: 这两个版本是区别 DB3和XML格式的，书架的cookie文件应保存在 FoxBook.cookie文件中，格式: <cookie><sitename>cookieStr</sitename><sitename>another CookieStr</sitename></cookie>
+- 下载源码解压到 D:\bin\Lua 下，应多出 libfox文件夹 fbDB3.lua fbFML.lua 文件
+- 2016-12-29: 这两个版本是区别 DB3和FML格式的，书架的cookie文件应保存在 FoxBook.cookie文件中，格式: <cookie><sitename>cookieStr</sitename><sitename>another CookieStr</sitename></cookie>
 - 命令行下使用以下命令更新
 
 ```Lua
 D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDB3.lua D:\xxx\FoxBook.db3
-D:\bin\lua\bin\lua.exe D:\bin\Lua\fbXML.lua D:\xxx\FoxBook.xml
+D:\bin\lua\bin\lua.exe D:\bin\Lua\fbFML.lua D:\xxx\FoxBook.fml
 ```
 
 **其他小提示:**
@@ -66,6 +66,7 @@ done
 
 
 **更新日志:**
+- 2017-01-06: 更名xml为fml
 - 2017-01-03: 移除无用的标签bookloc,pageloc
 - 2016-12-29: 将fb.lua更名为 fbDB3.lua，新增 fbXML.lua 以适应新版采用xml作为存储格式，更好跨平台，现可只依赖socket(亦可使用wget替代，以达到只需要lua主程序即可运行)
 - 2016-10-13: http库 设置timeout=5s，发现原来可以直接设置UserAgent，不用拐太多弯，可以先留着

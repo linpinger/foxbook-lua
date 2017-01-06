@@ -1,11 +1,11 @@
 #! /usr/bin/lua
 
-	local shelfFilePath = "FoxBook.xml"
+	local shelfFilePath = "FoxBook.fml"
 	local cookiePath = "FoxBook.cookie"
 	if nil ~= arg[1] then shelfFilePath = arg[1] end -- 命令行分析
 	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
 
-	local shelfName = string.match(shelfFilePath, "([^\\/]*).xml")
+	local shelfName = string.match(shelfFilePath, "([^\\/]*).fml")
 -- 判断是不是Linux环境
 if nil == string.match(package.path, '/') then
 	isLinux = false
@@ -18,9 +18,9 @@ end
 -- 各种依赖
 require("libfox.foxnovel")
 
-require("libfox.xmlStor")
+require("libfox.fmlStor")
 cookie = loadCookie(cookiePath)
-shelf = loadXML(shelfFilePath)  -- 反序列化xml
+shelf = loadFML(shelfFilePath)  -- 反序列化fml
 
 print("##  " .. shelfFilePath .. "  START")
 
@@ -213,7 +213,7 @@ table.sort(shelf, sortDescByPagesCount) -- 倒序排列，比较的因素必须�
 
 os.remove(shelfFilePath .. ".old")
 if os.rename(shelfFilePath, shelfFilePath .. ".old") then
-	saveXML(shelf, shelfFilePath) -- 序列化xml
+	saveFML(shelf, shelfFilePath) -- 序列化fml
 end
 
 print("##  " .. shelfName .. "  DONE  GOT " .. allNewCount .. " NewPages")
