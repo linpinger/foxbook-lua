@@ -1,7 +1,14 @@
 #! /usr/bin/lua
+	
+	-- 更新: lua this.lua data.fml
+	-- 显示 书/书的章 列表: lua this.lua data.fml ls [1]
+	-- 清空索引为1的书: lua this.lua data.fml cb 1
 
 	local shelfFilePath = "FoxBook.fml"
 	local cookiePath = "FoxBook.cookie"
+
+	local cmdStr = ""
+	if nil ~= arg[2] then cmdStr = arg[2] end
 	if nil ~= arg[1] then shelfFilePath = arg[1] end -- 命令行分析
 	local bGetShelfFirst = true  -- 是否先下载书架比较得到新书？
 
@@ -19,8 +26,53 @@ end
 require("libfox.foxnovel")
 
 require("libfox.fmlStor")
-cookie = loadCookie(cookiePath)
 shelf = loadFML(shelfFilePath)  -- 反序列化fml
+
+-- { -- 命令行处理
+if "ls" == cmdStr then -- 列出书列表/书的章节列表
+	local cmdBookIDX = tonumber(arg[3])
+	local showTB = ""
+	if nil == cmdBookIDX then
+		showTB = "\nbIDX\tPageC\tBookName\n"
+		for i, book in ipairs(shelf) do
+			showTB = showTB .. i .. "\t" .. #book.chapters .. "\t" .. book.bookname .. "\n"
+		end
+	else
+		showTB = "\npIDX\tPageName\n"
+		for i, page in ipairs(shelf[cmdBookIDX].chapters) do
+			showTB = showTB .. i .. "\t" .. page.pagename .. "\n"
+		end
+	end
+	if not isLinux then
+		require("libfox.utf8gbk")
+		showTB = utf8gbk(showTB, false)
+	end
+	print(showTB)
+	os.exit(0)
+elseif "cb" == cmdStr then -- 清空某本书并记录
+	local cmdBookIDX = tonumber(arg[3])
+	if nil == cmdBookIDX then
+		print('ClearBook Usage: xx.lua xx.fml cb 1')
+	else
+		local newDelList = shelf[cmdBookIDX].delurl
+		for i, page in ipairs(shelf[cmdBookIDX].chapters) do
+			newDelList = newDelList .. page.pageurl .. "|" .. page.pagename .. "\n"
+		end
+		newDelList = SimplifyDelList(newDelList) -- 精简dellist
+--		print(newDelList)
+		shelf[cmdBookIDX].delurl = newDelList
+		shelf[cmdBookIDX].chapters = {}
+
+		os.remove(shelfFilePath .. ".old")
+		if os.rename(shelfFilePath, shelfFilePath .. ".old") then
+			saveFML(shelf, shelfFilePath) -- 序列化fml
+		end
+	end
+	os.exit(0)
+end
+-- } -- 命令行处理
+
+cookie = loadCookie(cookiePath)
 
 print("##  " .. shelfFilePath .. "  START")
 
