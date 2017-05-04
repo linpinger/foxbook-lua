@@ -9,23 +9,29 @@ function compareShelfToGetNew(shelf, cookie)
 	-- 根据mainURL 得到 书架地址 urlShelf, Shelf匹配正则表达式
 	local siteType = 0
 	local iCookie, urlShelf, reShelf = '', '', '<tr>.-(aid=[^"]*)"[^>]*>([^<]*)<.-<td class="odd"><a href="([^"]*)"[^>]*>([^<]*)<'
-	if string.match(mainURL, "\.13xs\.") then
+	if string.match(mainURL, "%.13xs%.") then
 		siteType = 11
 		urlShelf = "http://www.13xs.com/shujia.aspx"
 		reShelf  = '<tr>.-(aid=[^"]*)&index.-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
 		iCookie = cookie.site13xs
 	end
-	if string.match(mainURL, "\.dajiadu\.") then
+	if string.match(mainURL, "%.dajiadu%.") then
 		siteType = 22
 		urlShelf = "http://www.dajiadu.net/modules/article/bookcase.php"
 		reShelf  = '<tr>.-(aid=[^"]*)&index.-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
 		iCookie = cookie.sitedajiadu
 	end
-	if string.match(mainURL, "\.biquge\.") then
+	if string.match(mainURL, "%.biquge%.") then
 		siteType = 33
 		urlShelf = "http://www.biquge.com.tw/modules/article/bookcase.php"
 		reShelf  = '<tr>.-(aid=[^"]*)"[^>]*>([^<]*)<.-<td class="odd"><a href="([^"]*)"[^>]*>([^<]*)<'
 		iCookie = cookie.sitebiquge
+	end
+	if string.match(mainURL, "%.piaotian%.") then
+		siteType = 44
+		urlShelf = "http://www.piaotian.com/modules/article/bookcase.php"
+		reShelf  = '<tr>.-(aid=[^"]*)".-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
+		iCookie = cookie.sitepiaotian
 	end
 	if siteType == 0 then return nil end  -- 当不在书架规则列表中时，返回nil
 	iCookie = cookie2Field(iCookie)
@@ -46,7 +52,7 @@ function compareShelfToGetNew(shelf, cookie)
 		print("    Download: retry: " .. downTry .. "  Shelf  len(html): " .. string.len(html))
 	end
 
---	filewriteB(html, "xxxxx.html")
+--	filewrite(html, "xxxxx.html")
 --	html = fileread("xxxxx.html")
 
 	-- 判断网页编码并转成utf-8
@@ -64,6 +70,7 @@ function compareShelfToGetNew(shelf, cookie)
 		realPageURLR = pageurlR
 		if 11 == siteType then realPageURLR = pageurlR .. ".html" end
 		if 22 == siteType then realPageURLR = pageurlR .. ".html" end
+		if 44 == siteType then realPageURLR = pageurlR .. ".html" end
 
 		local bookIDX = 0
 		local booknameL, bookurlL, delListL = '', '', ''
@@ -84,7 +91,7 @@ function compareShelfToGetNew(shelf, cookie)
 
 		-- 判断最新章节链接是否在链接列表中，否就有新章节，添加到返回表中
 		if '' ~= delListL then
-			if not string.match(delListL, '\n' .. realPageURLR .. '\|') then
+			if not string.match(delListL, '\n' .. realPageURLR .. '%|') then
 --				print("idx=" .. bookIDX .. "\nname=" .. booknameL .. "\nurl=" .. bookurlL .. "\nlist=" .. delListL)
 				local ll = {bookidx=bookIDX, bookname=booknameL, bookurl=bookurlL, dellist=delListL}
 				table.insert(nn, ll)

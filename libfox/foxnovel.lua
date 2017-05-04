@@ -3,6 +3,13 @@
 --- {
 -- { 通用函数
 
+-- 文件是否存在
+function fileexist(path)
+	local file = io.open(path, "rb")
+	if file then file:close() end
+	return file ~= nil
+end
+
 -- 读取文件到变量中
 function fileread(iFilePath)
 	local f = assert(io.open(iFilePath, "r"))
@@ -13,11 +20,6 @@ end
 
 -- 写变量到文件中
 function filewrite(nr, oFilePath)
-	local f = assert(io.open(oFilePath, "w"))
-	f:write(nr)
-	f:close()
-end
-function filewriteB(nr, oFilePath)
 	local f = assert(io.open(oFilePath, "wb"))
 	f:write(nr)
 	f:close()
@@ -230,12 +232,12 @@ end
 
 -- { 删除文本尾部乱七八糟的玩意儿
 function delNouseText(text)
-	local xx = string.match(text, '([\(（]?未完待续.*)$')
+	local xx = string.match(text, '([%(（]?未完待续.*)$')
 	if ( nil == xx ) then
 		return text
 	end
 	if ( string.len(xx) < 500 ) then
-		text = string.gsub(text, '[\(（]?未完待续.*$', '')
+		text = string.gsub(text, '[%(（]?未完待续.*$', '')
 	end
 	return text
 end

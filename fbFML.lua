@@ -19,7 +19,7 @@ if nil == string.match(package.path, '/') then
 	package.path = package.path .. ";C:\\bin\\Lua\\?.lua;D:\\bin\\Lua\\?.lua;"
 else
 	isLinux = true
-	package.path = package.path .. ";/aaa/bin/?.lua;/root/bin/?.lua;/home/fox/bin/?.lua;"
+	package.path = package.path .. ";/aaa/bin/?.lua;/root/bin/?.lua;/home/fox/bin/?.lua;/dev/shm/00/?.lua;"
 end
 
 -- 各种依赖
@@ -101,7 +101,7 @@ if bGetShelfFirst then
 -- os.exit(0)
 
 	if nil == upBooksList then
-		upBooksList = getAllBooksToUpdate() 
+		upBooksList = getAllBooksToUpdate(shelf) 
 		print('**  ' .. shelfName .. ' Have ' .. #upBooksList .. ' Books Update, Maybe shelf isnot suport or no cookie')
 	else
 		if #upBooksList > 0 then
@@ -113,7 +113,7 @@ if bGetShelfFirst then
 		os.exit(0)
 	end
 else
-	upBooksList = getAllBooksToUpdate() 
+	upBooksList = getAllBooksToUpdate(shelf) 
 	print('**  ' .. shelfName .. ' Have ' .. #upBooksList .. ' Books To Update')
 end
 
@@ -163,7 +163,7 @@ for i, t in ipairs(upBooksList) do
 	if #gg > 0 then  -- 防止下载错误
 		local nn = {}
 		if string.len(pageListInDB) > 5 then
-			local firstline = string.match(pageListInDB, '([^|]-)\|')
+			local firstline = string.match(pageListInDB, '([^|]-)%|')
 			local bFound = false
 			for j=1, #gg do
 				if not bFound then
@@ -171,7 +171,7 @@ for i, t in ipairs(upBooksList) do
 						bFound = true
 					end
 				else
-					if not string.match(pageListInDB, '\n' .. string.gsub(gg[j]["l"], '%?', '%%?') .. '\|') then
+					if not string.match(pageListInDB, '\n' .. string.gsub(gg[j]["l"], '%?', '%%?') .. '%|') then
 						table.insert(nn, gg[j])
 					end
 				end

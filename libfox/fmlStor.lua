@@ -12,6 +12,7 @@ function loadCookie(cookiePath)
 	cookie.site13xs = getValue(xml, "13xs")
 	cookie.sitebiquge = getValue(xml, "biquge")
 	cookie.sitedajiadu = getValue(xml, "dajiadu")
+	cookie.sitepiaotian = getValue(xml, "piaotian")
 	return cookie
 end
 
@@ -68,7 +69,7 @@ function saveFML(shelf, savePath)
 	end
 	table.insert(fml, '</shelf>\n')
 	require "libfox.foxnovel"
-	filewriteB(table.concat(fml, '\n'), savePath)
+	filewrite(table.concat(fml, '\n'), savePath)
 end
 
 

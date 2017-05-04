@@ -16,6 +16,7 @@
 
 **亮点:** 
 
+- 2017-5-4: linux下只需lua主程序与wget即可，不依赖其他库，另外可使用lua5.1/5.2/5.3运行
 - 这个Lua版本，自己写了GBK与UTF-8互转的函数，不需要iconv了，以适应openwrt下iconv无法转换GBK的问题
 - 通用小说网站规则能覆盖大部分文字站的目录及正文内容分析，不需要针对每个网站的规则
 - 本版本是用Lua脚本语言开发的，所以可以在 win/linux/mac 下运行
@@ -41,6 +42,7 @@
 D:\bin\lua\bin\lua.exe D:\bin\Lua\fbDB3.lua D:\xxx\FoxBook.db3
 D:\bin\lua\bin\lua.exe D:\bin\Lua\fbFML.lua D:\xxx\FoxBook.fml
 ```
+- 2017-5-4: linux/mingw下使用源码编译单文件lua方法，先到官网下载所有源码合计包，进入相对应的版本文件夹，make即可得到lua程序，可以复制出来使用，这个自己编译的依赖最小
 
 **其他小提示:**
 
@@ -66,6 +68,7 @@ done
 
 
 **更新日志:**
+- 2017-05-04: 修改bug，添加书架，修改以适配win/linux/openwrt，现fbFML.lua可不依赖第三方库(socket,sqlite3,lfs)，在linux下只需lua及wget可执行文件即可，不需依赖其他
 - 2017-01-10: 添加功能: 命令行列出书/章，清空书
 - 2017-01-06: 更名xml为fml
 - 2017-01-03: 移除无用的标签bookloc,pageloc
