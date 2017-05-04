@@ -68,6 +68,7 @@ done
 
 
 **更新日志:**
+- 2017-05-04: 添加书架，重写读取cookie函数
 - 2017-05-04: 修改bug，添加书架，修改以适配win/linux/openwrt，现fbFML.lua可不依赖第三方库(socket,sqlite3,lfs)，在linux下只需lua及wget可执行文件即可，不需依赖其他
 - 2017-01-10: 添加功能: 命令行列出书/章，清空书
 - 2017-01-06: 更名xml为fml

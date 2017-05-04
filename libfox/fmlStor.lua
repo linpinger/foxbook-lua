@@ -6,13 +6,13 @@ function getValue(inStr, inKey)
 end
 
 function loadCookie(cookiePath)
-	require "libfox.foxnovel"
 	local xml = fileread(cookiePath)
 	local cookie = {}
-	cookie.site13xs = getValue(xml, "13xs")
-	cookie.sitebiquge = getValue(xml, "biquge")
-	cookie.sitedajiadu = getValue(xml, "dajiadu")
-	cookie.sitepiaotian = getValue(xml, "piaotian")
+	for tag in string.gmatch(xml, '<([^</>"]*)>') do
+		if tag ~= 'cookies' then
+			cookie[tag] = getValue(xml, tag)
+		end
+	end
 	return cookie
 end
 
