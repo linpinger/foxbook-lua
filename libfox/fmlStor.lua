@@ -6,6 +6,7 @@ function getValue(inStr, inKey)
 end
 
 function loadCookie(cookiePath)
+	require "libfox.foxos"
 	local xml = fileread(cookiePath)
 	local cookie = {}
 	for tag in string.gmatch(xml, '<([^</>"]*)>') do
@@ -17,7 +18,7 @@ function loadCookie(cookiePath)
 end
 
 function loadFML(fmlPath)
-	require "libfox.foxnovel"
+	require "libfox.foxos"
 	local fml = fileread(fmlPath)
 	local shelf = {}
 	for bookStr in string.gmatch(fml, "<novel>(.-)</novel>") do
@@ -68,7 +69,7 @@ function saveFML(shelf, savePath)
 		table.insert(fml, '</novel>\n')
 	end
 	table.insert(fml, '</shelf>\n')
-	require "libfox.foxnovel"
+	require "libfox.foxos"
 	filewrite(table.concat(fml, '\n'), savePath)
 end
 

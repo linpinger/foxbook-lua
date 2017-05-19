@@ -1,17 +1,5 @@
 #! /usr/bin/lua
 
-function gethtml(inURL, postData, cookie)
-	if nil == string.match(package.path, '/') then
-		return gethtmlI(inURL, postData, cookie) -- win 用内置库
-	else
-		require "libfox.foxnovel"
-		if fileexist('/aaa/') then
-			return gethtmlI(inURL, postData, cookie) -- wrt 用内置库
-		else
-			return gethtmlW(inURL, postData, cookie) -- linux 用wget
-		end
-	end
-end
 
 function gethtmlW(inURL, postData, cookie)
 	local tmpName = os.tmpname()
@@ -20,7 +8,7 @@ function gethtmlW(inURL, postData, cookie)
 	if nil ~= cookie then cmd = cmd .. ' --header="Cookie: ' .. cookie .. '"' end
 	if nil ~= postData then cmd = cmd .. ' --post-data=' .. postData end
 	local aa, bb, cc = os.execute(cmd) -- 版本区别 5.1:aa=0 else:cc=0
-	require "libfox.foxnovel"
+	require "libfox.foxos"
 	local html = fileread(tmpName)
 	os.remove(tmpName)
 	local code = 0
@@ -60,6 +48,36 @@ function gethtmlI(inURL, postData, cookie)
 	return table.concat(html), c, h, s
 end
 
+function gethtmlOne(inURL, postData, cookie)
+	if nil == string.match(package.path, '/') then
+		return gethtmlI(inURL, postData, cookie) -- win 用内置库
+	else
+		require "libfox.foxos"
+		if fileexist('/aaa/') then
+			return gethtmlI(inURL, postData, cookie) -- wrt 用内置库
+		else
+			return gethtmlW(inURL, postData, cookie) -- linux 用wget
+		end
+	end
+end
+
+function gethtml(inURL, postData, cookie)
+	local html = ''
+	local downTry = 0
+	while downTry < 4 do
+		html, httpok = gethtmlOne(inURL, postData, cookie)  -- 下载页面
+		if nil == html then html = '' end
+		if 200 == httpok then
+			if string.len(html) > 2048 then
+				break
+			end
+		end
+		downTry = downTry + 1
+		print("    Download: retry: " .. downTry .. "  len(html): " .. string.len(html))
+	end
+	return html
+end
+
 -- Wget Cookie 转为HTTP头中Cookie字段
 function cookie2Field(iCookie)
 	local ostr = ""
@@ -67,5 +85,23 @@ function cookie2Field(iCookie)
 		ostr = ostr .. xx .. '=' .. oo .. '; '
 	end
 	return ostr
+end
+
+function html2utf8(html, inURL)
+	if nil == inURL then inURL = '' end
+	if string.match(inURL, "files%.qidian%.com") then
+		require("libfox.utf8gbk")
+		html = utf8gbk(html, true)
+	elseif string.match(inURL, "%.qidian%.com") then
+		return html
+	elseif string.match(inURL, "%.xxbiquge%.com") then
+		return html
+	else -- 判断网页编码并转成utf-8
+		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
+			require("libfox.utf8gbk")
+			html = utf8gbk(html, true)
+		end
+	end
+	return html
 end
 

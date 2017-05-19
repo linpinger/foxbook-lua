@@ -37,7 +37,7 @@ print("##  " .. dbPath .. "  START")
 
 local upBooksList = {}
 if bGetShelfFirst then
-	require("libfox.siteshelf")
+	require("libfox.siteshelfDB3")
 	upBooksList = compareShelfToGetNew() -- 获取有新章的书列表,　返回的数组元素: -- bookid, bookname, bookurl, dellist
 	if nil == upBooksList then
 		upBooksList = getAllBooksToUpdate() 
@@ -73,33 +73,12 @@ for i, t in ipairs(upBooksList) do
 	end
 -- { 不同站点下载目录
 	local gg = {}
-	if string.match(bookurl, 'm.qreader.me') then  -- qreader
-		require("libfox.siteqreader")
-		gg = qreader_GetIndex(bookurl)
-	else -- 通用站点
-		local downTry = 0
-		while downTry < 4 do
-			html, httpok = gethtml(bookurl) -- 下载目录
-			if 200 == httpok then
-				if string.len(html) > 2048 then
-					break
-				end
-			end
-			downTry = downTry + 1
-			print("    Download: retry: " .. downTry .. "  bid: " .. bookid .. "  len(html): " .. string.len(html))
-		end
-
-		-- 判断网页编码并转成utf-8
-		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-			require("libfox.utf8gbk")
-			html = utf8gbk(html, true)
-		end
-
-		if httpok then
-			if string.len(html) > 2048 then
-				gg = getIndexs(html) -- 分析目录
-				html = nil
-			end
+	do -- 通用站点
+		html = gethtml(bookurl) -- 下载目录
+		html = html2utf8(html, bookurl) -- 判断网页编码并转成utf-8
+		if string.len(html) > 2048 then
+			gg = getIndexs(html) -- 分析目录
+			html = nil
 		end
 	end
 -- } 不同站点下载目录
@@ -140,30 +119,12 @@ for i, t in ipairs(upBooksList) do
 
 			-- { 不同站点下载页面
 			local text = ""
-			if string.match(bookurl, 'm.qreader.me') then
-				require("libfox.siteqreader")
-				text = qreader_GetContent(bookurl .. pageurl)
-			elseif string.match(bookurl, 'msn.qidian.com') then
+			if string.match(bookurl, 'msn.qidian.com') then
 				require("libfox.siteqidian")
 				text = qidian_GetContent(bookurl, pageurl)
 			else
-				local downTry = 0
-				while downTry < 4 do
-					html, httpok = gethtml(realpageurl)  -- 下载页面
-					if 200 == httpok then
-						if string.len(html) > 2048 then
-							break
-						end
-					end
-					downTry = downTry + 1
-					print("    Download: retry: " .. downTry .. "  bid: " .. bookid .. "  len(html): " .. string.len(html))
-				end
-
-				-- 判断网页编码并转成utf-8
-				if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-					require("libfox.utf8gbk")
-					html = utf8gbk(html, true)
-				end
+				html = gethtml(realpageurl)  -- 下载页面
+				html = html2utf8(html, realpageurl) -- 判断网页编码并转成utf-8
 
 				text = getPageText(html)
 				html = nil

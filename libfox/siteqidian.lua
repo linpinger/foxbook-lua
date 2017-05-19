@@ -1,22 +1,23 @@
 #! /usr/bin/lua
 
--- function qidian_GetIndex(dbBookUrl) end
+function qidian_GetIndex(json)
+	toc = {}
+	local bookid = string.match(json, '"BookId":([0-9]+),')
+	local urlHead = "http://files.qidian.com/Author" .. ( 1 + math.fmod(tonumber(bookid), 8) ) .. "/" .. bookid .. "/"
 
-function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=1003290088&chapterid=306910701
-	require("libfox.foxhttp")
-	local bookid, pageid = string.match(PgURL, 'bookid=([0-9]*)&chapterid=([0-9]*)')
-	local pageurl = "http://files.qidian.com/Author" .. ( 1 + math.fmod(tonumber(bookid), 8) ) .. "/" .. bookid .. "/" .. pageid .. ".txt"
-
-	local html = ''
-	local downTry = 0
-	while downTry < 4 do
-		html, httpok = gethtml(pageurl) -- 下载章节
-		if 200 == httpok then break end
-		downTry = downTry + 1
-		print("    Download: retry: " .. downTry .. "  QDid: " .. bookid .. "  len(html): " .. string.len(html))
+	for cc,nn,vv in string.gmatch(json, '"c":([0-9]+),"n":"([^"]+)".-"v":([01]),') do
+		local lk = {}
+		lk["l"] = urlHead .. cc .. ".txt"
+		lk["n"] = nn
+		lk["len"] = string.len(lk["l"])
+		if '0' == vv then
+			table.insert(toc, lk)
+		end
 	end
-	require("libfox.utf8gbk")
-	html = utf8gbk(html, true)
+	return toc
+end
+
+function qidian_GetContent(html) -- _, ReadChapter.aspx?bookid=1003290088&chapterid=306910701
 	html = string.gsub(html, "document.write%(%'", '')
 	html = string.gsub(html, "%'%);", '')
 	html = string.gsub(html, "<p>", '\n')
@@ -26,11 +27,4 @@ function qidian_GetContent(BkURL, PgURL) -- _, ReadChapter.aspx?bookid=100329008
 	if '\n' == string.sub(html, 1, 1) then html = string.sub(html, 2) end -- 删除头部多余的换行符
 	return html
 end
-
---[[
-bookurl = "http://read.qidian.com/BookReader/aB6G8TfI_5PVl9ByXxZ_TQ2.aspx"
-bookurl = "http://msn.qidian.com/ReadBook.aspx?bookid=1003290088"
-text = qidian_GetContent(nil, 'ReadChapter.aspx?bookid=1003290088&chapterid=306910701')
---]]
-
 

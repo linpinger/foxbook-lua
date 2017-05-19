@@ -56,26 +56,9 @@ function compareShelfToGetNew(shelf, cookie)
 	if '' == iCookie then return nil end  -- 当不存在cookie时，返回nil
 
 	-- 下载获取网页字符串: html
-	local html = ''
-	local downTry = 0
-	while downTry < 4 do
-		html, httpok = gethtml(urlShelf, nil, iCookie)  -- 下载书架
-		if 200 == httpok then
-			if string.len(html) > 2048 then
-				break
-			end
-		end
-		downTry = downTry + 1
-		if nil == html then html = '' end
-		print("    Download: retry: " .. downTry .. "  Shelf  len(html): " .. string.len(html))
-	end
-
-	-- 判断网页编码并转成utf-8
+	local html = gethtml(urlShelf, nil, iCookie)  -- 下载书架
 	if 55 ~= siteType then -- xxbiquge是个错的编码，实际是UTF8，写的是GBK，坑
-		if string.match(string.lower(html), '<meta.-charset=([^"]*)[^>]->') ~= "utf-8" then
-			require("libfox.utf8gbk")
-			html = utf8gbk(html, true)
-		end
+		html = html2utf8(html, urlShelf) -- 判断网页编码并转成utf-8
 	end
 
 	-- 循环每一记录，比较得到有新章节的书，有用的字段是: 书名, 最新章节的页面地址(可能要合成处理)，其他提示用

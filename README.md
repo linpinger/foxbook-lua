@@ -31,7 +31,7 @@
 - [文件下载点1:baidu][pan_baidu]
 
 **安装及使用方法:**
-
+- fbDB3.lua 版本不再维护，请使用 fbFML.lua
 - 先到[LuaDist](http://luadist.org/) 下载win版或linux64版或mac版
 - 解压压缩文件到 D:\bin\Lua 下，此时Lua文件夹下应有bin include lib share 文件夹
 - 下载源码解压到 D:\bin\Lua 下，应多出 libfox文件夹 fbDB3.lua fbFML.lua 文件
@@ -68,6 +68,7 @@ done
 
 
 **更新日志:**
+- 2017-05-19: 大修改，和python版流程大体相同
 - 2017-05-04: 添加书架，重写读取cookie函数
 - 2017-05-04: 修改bug，添加书架，修改以适配win/linux/openwrt，现fbFML.lua可不依赖第三方库(socket,sqlite3,lfs)，在linux下只需lua及wget可执行文件即可，不需依赖其他
 - 2017-01-10: 添加功能: 命令行列出书/章，清空书
