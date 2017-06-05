@@ -261,7 +261,7 @@ for i, t in ipairs(upBooksList) do
 			require("libfox.foxhttp")
 			html = gethtml(realpageurl)  -- 下载页面
 			html = html2utf8(html, realpageurl) -- 判断网页编码并转成utf-8
-			if string.match(realpageurl, 'files%.qidian%.com') then
+			if string.match(realpageurl, '%.qidian%.com/') then
 				require("libfox.siteqidian")
 				text = qidian_GetContent(html)
 			else

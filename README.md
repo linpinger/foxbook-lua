@@ -68,6 +68,7 @@ done
 
 
 **更新日志:**
+- 2017-06-05: 各版本修改起点接口
 - 2017-05-19: 大修改，和python版流程大体相同
 - 2017-05-04: 添加书架，重写读取cookie函数
 - 2017-05-04: 修改bug，添加书架，修改以适配win/linux/openwrt，现fbFML.lua可不依赖第三方库(socket,sqlite3,lfs)，在linux下只需lua及wget可执行文件即可，不需依赖其他
