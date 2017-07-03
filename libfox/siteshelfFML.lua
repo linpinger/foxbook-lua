@@ -9,43 +9,43 @@ function compareShelfToGetNew(shelf, cookie)
 	-- 根据mainURL 得到 书架地址 urlShelf, Shelf匹配正则表达式
 	local siteType = 0
 	local iCookie, urlShelf, reShelf = '', '', '<tr>.-(aid=[^"]*)"[^>]*>([^<]*)<.-<td class="odd"><a href="([^"]*)"[^>]*>([^<]*)<'
-	if string.match(mainURL, "%.13xs%.") then
+	if string.find(mainURL, ".13xs.", 1, true) then
 		siteType = 11
 		urlShelf = "http://www.13xs.com/shujia.aspx"
 		reShelf  = '<tr>.-(aid=[^"]*)&index.-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
 		iCookie = cookie['13xs']
 	end
-	if string.match(mainURL, "%.13xxs%.") then
+	if string.find(mainURL, ".13xxs.", 1, true) then
 		siteType = 12
 		urlShelf = "http://www.13xxs.com/modules/article/bookcase.php?classid=0"
 		reShelf  = '<tr>.-(aid=[^"]*)"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*/([0-9]*.html)"[^>]*>([^<]*)<'
 		iCookie = cookie['13xxs']
 	end
-	if string.match(mainURL, "%.dajiadu%.") then
+	if string.find(mainURL, ".dajiadu.", 1, true) then
 		siteType = 22
 		urlShelf = "http://www.dajiadu.net/modules/article/bookcase.php"
 		reShelf  = '<tr>.-(aid=[^"]*)&index.-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
 		iCookie = cookie['dajiadu']
 	end
-	if string.match(mainURL, "%.biquge%.") then
+	if string.find(mainURL, ".biquge.", 1, true) then
 		siteType = 33
 		urlShelf = "http://www.biquge.com.tw/modules/article/bookcase.php"
 		reShelf  = '<tr>.-(aid=[^"]*)"[^>]*>([^<]*)<.-<td class="odd"><a href="([^"]*)"[^>]*>([^<]*)<'
 		iCookie = cookie['biquge']
 	end
-	if string.match(mainURL, "%.piaotian%.") then
+	if string.find(mainURL, ".piaotian.", 1, true) then
 		siteType = 44
 		urlShelf = "http://www.piaotian.com/modules/article/bookcase.php"
 		reShelf  = '<tr>.-(aid=[^"]*)".-"[^>]*>([^<]*)<.-<td class="odd"><a href="[^"]*cid=([0-9]*)"[^>]*>([^<]*)<'
 		iCookie = cookie['piaotian']
 	end
-	if string.match(mainURL, "%.xxbiquge%.") then
+	if string.find(mainURL, ".xxbiquge.", 1, true) then
 		siteType = 55
 		urlShelf = "http://www.xxbiquge.com/bookcase.php"
 		reShelf  = '<li>.-"s2"><a href="([^"]*)"[^>]->([^<]*)<.-"s4"><a href="([^"]*)"[^>]*>([^<]*)<'
 		iCookie = cookie['xxbiquge']
 	end
-	if string.match(mainURL, "%.xqqxs%.") then
+	if string.find(mainURL, ".xqqxs.", 1, true) then
 		siteType = 66
 		urlShelf = "http://www.xqqxs.com/modules/article/bookcase.php?delid=604"
 		reShelf  = '<tr>.-(indexflag)[^>]*>([^<]*)<.-cid=([0-9]*)"[^>]*>([^<]*)<'
@@ -57,7 +57,10 @@ function compareShelfToGetNew(shelf, cookie)
 
 	-- 下载获取网页字符串: html
 	local html = gethtml(urlShelf, nil, iCookie)  -- 下载书架
-	if 55 ~= siteType then -- xxbiquge是个错的编码，实际是UTF8，写的是GBK，坑
+	if 55 == siteType then -- xxbiquge是个错的编码，实际是UTF8，写的是GBK，坑
+		html = html .. gethtml(urlShelf .. "?page=2", nil, iCookie)
+		html = html .. gethtml(urlShelf .. "?page=3", nil, iCookie)
+	else
 		html = html2utf8(html, urlShelf) -- 判断网页编码并转成utf-8
 	end
 
@@ -89,7 +92,7 @@ function compareShelfToGetNew(shelf, cookie)
 
 		-- 判断最新章节链接是否在链接列表中，否就有新章节，添加到返回表中
 		if '' ~= delListL then
-			if not string.match(delListL, '\n' .. realPageURLR .. '%|') then
+			if not string.find(delListL, '\n' .. realPageURLR .. '|', 1, true) then
 --				print("idx=" .. bookIDX .. "\nname=" .. booknameL .. "\nurl=" .. bookurlL .. "\nlist=" .. delListL)
 				local ll = {bookidx=bookIDX, bookname=booknameL, bookurl=bookurlL, dellist=delListL}
 				table.insert(nn, ll)

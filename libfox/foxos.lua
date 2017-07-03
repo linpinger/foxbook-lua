@@ -25,11 +25,22 @@ end
 -- 判断是否是 Linux 环境
 --[[
 function islinux()
-	if nil == string.match(package.path, '/') then  -- windows
+	if nil == string.find(package.path, '/', 1, true) then  -- windows
 		return false
 	else -- linux
 		return true
 	end
 end
 --]]
+
+function getFileName(filePath) -- 从路径获取文件名
+	local fileName = string.match(filePath, '/([^/\\]+)$')
+	if nil == fileName then
+		fileName = string.match(filePath, '\\([^/\\]+)$')
+		if nil == fileName then
+			fileName = filePath
+		end
+	end
+	return fileName
+end
 

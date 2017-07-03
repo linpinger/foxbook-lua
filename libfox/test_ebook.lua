@@ -51,7 +51,7 @@ end
 
 -- { 操作系统检测
 function osdetect()
-	if nil == string.match(package.path, '/') then
+	if nil == string.find(package.path, '/', 1, true) then
 		ebook.ostype = "win"
 		ebook.osPathSep="\\"
 	else

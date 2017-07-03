@@ -24,7 +24,7 @@
 	end
 
 	-- 此语句需在 require 之前
-	if nil == string.match(package.path, '/') then  -- windows
+	if nil == string.find(package.path, '/', 1, true) then  -- windows
 		package.path = package.path .. ";C:\\bin\\Lua\\?.lua;D:\\bin\\Lua\\?.lua;"
 		isLinux = false
 		wDir  = '/bin/sqlite/FoxBook/'
@@ -172,7 +172,7 @@ function compareBook2GetNewPages(bookList, bookAllPageStr)
 						bFound = true
 					end
 				else
-					if not string.match(bookAllPageStr, '\n' .. string.gsub(bookList[j]["l"], '%?', '%%?') .. '%|') then
+					if not string.find(bookAllPageStr, '\n' .. bookList[j]["l"] .. '|', 1, true) then
 						table.insert(nn, bookList[j])
 					end
 				end
@@ -230,7 +230,7 @@ for i, t in ipairs(upBooksList) do
 	html = gethtml(bookurl) -- 下载目录
 	html = html2utf8(html, bookurl) -- 判断网页编码并转成utf-8
 	local gg = {}
-	if string.match(bookurl, "druid%.if%.qidian%.com/Atom%.axd/Api/Book/GetChapterList") then
+	if string.find(bookurl, "druid.if.qidian.com/Atom.axd/Api/Book/GetChapterList", 1, true) then
 		require("libfox.siteqidian")
 		gg = qidian_GetIndex(html)
 	else -- 通用站点
@@ -261,7 +261,7 @@ for i, t in ipairs(upBooksList) do
 			require("libfox.foxhttp")
 			html = gethtml(realpageurl)  -- 下载页面
 			html = html2utf8(html, realpageurl) -- 判断网页编码并转成utf-8
-			if string.match(realpageurl, '%.qidian%.com/') then
+			if string.find(realpageurl, '.qidian.com/', 1, true) then
 				require("libfox.siteqidian")
 				text = qidian_GetContent(html)
 			else

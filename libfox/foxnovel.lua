@@ -19,7 +19,7 @@ end
 
 -- 根据客户端判断正文字体大小
 function getContentSize()
-	if nil == string.match(os.getenv('HTTP_USER_AGENT'), 'Android') then
+	if nil == string.find(os.getenv('HTTP_USER_AGENT'), 'Android', 1, true) then
 		return 22  -- Not Android
 	else
 		return 18  -- Android
